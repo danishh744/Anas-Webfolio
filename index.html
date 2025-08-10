@@ -2,139 +2,636 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Danish Raja - Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHOP.CO - E-commerce</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    .logo {
+      height: 50px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      margin-left: 9px;
+      height: 65px;
+      width: 65px;
+      border-radius: 49px;
+    }
+    .logo:hover {
+      transform: scale(1.05);
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 24px;
+      color: #333;
+      margin-left: 10px;
+    }
+    </style>
 </head>
 <body>
-    <header>
-    <div class="site-title">
-      <h1>Danish Portfolio</h1>
-      <p>Just another My Blog Site</p>
+  
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="cart-modal" style="display: none;">
+    <div class="cart-modal-content">
+      <span id="cart-close-btn" class="cart-close-btn" onclick="closeCart()">×</span>
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <span id="cart-total">Total: $0</span>
+        <button id="checkout-btn">Checkout</button>
+      </div>
     </div>
-    <nav>
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About Me</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#skills">Skill</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#blog">Blog</a></li>
-        <li><a href="#contact">Contact Us</a></li>
-      </ul>
-    </nav>
-  </header>
-  <div class="mango" id="home">
-    <div class="container">
-      <div class="content">
-        <div class="text">
-          <h1>Danish Raja</h1>
-          <p>Professional Web Developer & Karate Champion</p><br>
-          <a href="#contact" class="btn">Hire Me</a>
+  </div>
+         
+  <div id="cart-empty-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('cart-empty')">×</span>
+      <h2>Your Cart is Empty</h2>
+      <p>Add items to your cart to proceed to checkout.</p>
+      <button onclick="navigateToShop()" class="shop-now-btn">Shop Now</button>
+    </div>
+  </div>
+
+  
+  <div id="wishlist-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('wishlist')">×</span>
+      <h2>Your Wishlist</h2>
+      <div id="wishlist-items">
+        <p>Your wishlist is currently empty. Start adding your favorite products!</p>
+      </div>
+      <button onclick="navigateToShop()" class="shop-now-btn">Shop Now</button>
+    </div>
+  </div>
+
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('auth')">×</span>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      <section class="log-auth">
+      <div id="login-form" class="auth-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button onclick="handleAuth(true)">Login</button>
+      </div></section>
+      <div id="signup-form" class="auth-form" style="display:none;">
+        <input type="text" id="signup-name" placeholder="Full Name" required>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button onclick="handleAuth(false)">Create Account</button>
+      </div>
+    </div>
+  </div>
+  <div id="quickview-modal" class="modal">
+    <div class="modal-content quickview-content">
+      <span class="close-btn" onclick="closeModal('quickview')">×</span>
+      <div class="quickview-body">
+        <div class="quickview-image-container">
+          <img id="quickview-image" src="" alt="Product" class="quickview-image">
         </div>
-        <div class="image">
-          <img src="libraryP1.jpg" alt="Danish Raja"/>
+        <div class="quickview-details">
+          <h2 id="quickview-title"></h2>
+          <div class="product-rating">
+            <span id="quickview-rating">★★★★☆</span>
+            <span id="quickview-reviews" class="rating-count">(24)</span>
+          </div>
+          <div class="price-container">
+            <span id="quickview-price"></span>
+            <span id="quickview-old-price" class="old-price"></span>
+          </div>
+          <p id="quickview-description">This stylish product is perfect for any occasion. Made with premium materials for comfort and durability.</p>
+          <div class="product-options">
+            <h4>Size</h4>
+            <div class="size-selector">
+              <div class="size-option" onclick="selectSize(this)">S</div>
+              <div class="size-option" onclick="selectSize(this)">M</div>
+              <div class="size-option" onclick="selectSize(this)">L</div>
+              <div class="size-option" onclick="selectSize(this)">XL</div>
+            </div>
+            
+            <h4>Color</h4>
+            <div class="color-filter">
+              <div class="color-option" style="background-color: #000;" onclick="selectColor(this)"></div>
+              <div class="color-option" style="background-color: #4A90E2;" onclick="selectColor(this)"></div>
+              <div class="color-option" style="background-color: #D0021B;" onclick="selectColor(this)"></div>
+            </div>
+          </div>
+          
+          <div class="quantity-selector">
+            <h4>Quantity</h4>
+            <div class="quantity-control">
+              <button onclick="changeQuantity(-1)">-</button>
+              <input type="number" id="product-quantity" value="1" min="1" max="10">
+              <button onclick="changeQuantity(1)">+</button>
+            </div>
+          </div>
+          
+          <div class="product-actions">
+            <button id="quickview-add-to-cart" class="add-to-cart-btn">Add to Cart</button>
+            <button id="quickview-add-to-wishlist" class="wishlist-btn">Add to Wishlist</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <section class="about" id="about">
-    <div class="container">
-        <h2>About Me</h2>
-        <div class="about-content"></div>
-        <img src="libraryP1.jpg" alt="Danish Raja" class="about-img">
-        <div class="about-text">
-          <p>I am a Developer blending technical skills with academic knowledge to shape IT solutions
-             and guide development projects. 
-            I specialize in clean code and scalable design crafting sleek websites, 
-            I thrive on building innovative and user-friendly solutions. 
-            <br>But that's just one side of me.<br> 
-          When I'm not coding, I'm I'm out on the field-swinging the bat, or dominating the dojo.
-          <b>I'm a state-level karate champion</b>, an energetic <b>cricketer</b> 
-          who believes in discipline, teamwork and pushing limits.
-          <br> Beyond the screen as prod ground I am a drawn to the wild 
-          a true explorer at heart whether it's chasing sunrise hiking trails or shocking in the calm 
-          of nature I leave for the moments that make the soul be alive.</p>
-          <a href="danish_CV.pdf" class="btn">Download Resume</a>
+  <div id="notification" class="notification"></div>
+
+
+  <div class="loading-spinner" id="loading-spinner"></div>
+
+
+  <header>
+    <div class="navbar"
+      >
+      <a href="/">
+        <img src="logo.jpg" alt="SHOP.CO Logo" class="logo" />
+      </a>
+  
+     
+      <nav class="main-nav">
+        <a href="#shop">Shop</a>
+        <a href="#sale">On Sale</a>
+        <a href="#new">New Arrivals</a>
+        <a href="#brands">Brands</a>
+      </nav>
+      
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search products..." aria-label="Search products" />
+        <button id="search-button" aria-label="Search"><i class="fas fa-search"></i></button>
+        <button id="clear-search" style="display:none;" aria-label="Clear search"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="icons">
+        <a href="#" onclick="openModal('cart')" aria-label="View Cart">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="cart-count" class="badge">0</span>
+        </a>
+        <a href="#" onclick="openModal('wishlist')" aria-label="View Wishlist">
+          <i class="fas fa-heart"></i>
+          <span id="wishlist-count" class="badge">0</span>
+        </a>
+        <div class="user-menu">
+          <button id="user-button" class="user-btn" aria-label="User account">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Account</span>
+          </button>
+          <div id="user-dropdown" class="user-dropdown">
+            <a href="#" id="login-link" onclick="openModal('auth')">Login</a>
+            <a href="#" id="profile-link" style="display:none;">My Profile</a>
+            <a href="#" id="orders-link" style="display:none;">My Orders</a>
+            <a href="#" id="logout-link" onclick="handleLogout()" style="display:none;">Logout</a>
+          </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="skills" id="skills">
-    <div class="container">
-      <h2>Skills</h2>
-      <div class="skill">
-        <label>HTML5 & CSS3</label>
-        <div class="bar"><div style="width: 90%;"></div></div>
-      </div>
-      <div class="skill">
-        <label>JavaScript</label>
-        <div class="bar"><div style="width: 65%;"></div></div>
-      </div>
-      <div class="skill">
-        <label>Python</label>
-        <div class="bar"><div style="width: 80%;"></div></div>
-      </div>
-      <div class="skill">
-        <label>C Programming</label>
-        <div class="bar"><div style="width: 70%;"></div></div>
-      </div>
-      <div class="skill">
-        <label>C++</label>
-        <div class="bar"><div style="width: 70%;"></div></div>
-      </div>
+   
+    <div class="category-bar">
+      <a href="#men" onclick="showCategory('men')" class="active">Men</a>
+      <a href="#women" onclick="showCategory('women')">Women</a>
+      <a href="#kids" onclick="showCategory('kids')">Kids</a>
+      <a href="#accessories" onclick="showCategory('accessories')">Accessories</a>
+      <a href="#sale" onclick="showCategory('sale')">Sale</a>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="hero-content">
+      <h2>FIND CLOTHES THAT MATCH YOUR STYLE</h2>
+      <p>Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality.</p>
+      <button class="shop-now" onclick="scrollToSection('shop')">Shop Now</button>
     </div>
   </section>
 
-  <section class="projects" id="projects">
-    <div class="container">
-      <h2>Projects</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>Doclinker & Connect </h3>
-          <p>An online doctors appointment booking site.</p>
+  <div class="statistics">
+    <div class="stat-item">
+      <i class="fas fa-store"></i>
+      <span>200+ International Brands</span>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-item">
+      <i class="fas fa-tshirt"></i>
+      <span>2,000+ High-Quality Products</span>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-item">
+      <i class="fas fa-users"></i>
+      <span>30,000+ Happy Customers</span>
+    </div>
+  </div>
+
+ 
+  <div class="shop-controls">
+    <div class="filter-button" onclick="toggleFilters()">
+      <i class="fas fa-filter"></i> Filter
+    </div>
+    <div class="sort-dropdown">
+      <select id="sort-select" onchange="sortProducts(this.value)" aria-label="Sort products">
+        <option value="default">Sort by: Featured</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="rating">Best Rating</option>
+        <option value="newest">Newest First</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="shop-container">
+
+    <div class="product-filters" id="product-filters">
+      <h3>Filters</h3>
+      <div class="filter-group">
+        <h4>Price Range</h4>
+        <div class="price-slider">
+          <input type="range" min="0" max="500" value="250" class="slider" id="price-slider">
+          <div class="price-range-values">
+            <span>$0</span>
+            <span id="price-value">$250</span>
+            <span>$500</span>
+          </div>
         </div>
-        <div class="card">
-          <h3>DevPortfolio</h3>
-          <p>A personal portfolio with interactive UI and downloadable resume.</p>
+      </div>
+      
+      <div class="filter-group">
+        <h4>Colors</h4>
+        <div class="color-filter">
+          <div class="color-option" style="background-color: #000;" onclick="filterByColor('black')"></div>
+          <div class="color-option" style="background-color: #fff; border: 1px solid #ddd;" onclick="filterByColor('white')"></div>
+          <div class="color-option" style="background-color: #4A90E2;" onclick="filterByColor('blue')"></div>
+          <div class="color-option" style="background-color: #D0021B;" onclick="filterByColor('red')"></div>
+          <div class="color-option" style="background-color: #7ED321;" onclick="filterByColor('green')"></div>
         </div>
-        <div class="card">
-          <h3>ShopCo</h3>
-          <p>An E-commerce website of branded and luxury items.</p>
+      </div>
+      
+      <div class="filter-group">
+        <h4>Size</h4>
+        <div class="size-filter">
+          <label><input type="checkbox" value="xs"> XS</label>
+          <label><input type="checkbox" value="s"> S</label>
+          <label><input type="checkbox" value="m"> M</label>
+          <label><input type="checkbox" value="l"> L</label>
+          <label><input type="checkbox" value="xl"> XL</label>
         </div>
-        <div class="card">
-          <h3>ShuttershopX</h3>
-          <p>Cameras, Lenses and Accessories and Our services of Filming and Photography.</p>
+      </div>
+      
+      <div class="filter-group">
+        <h4>Brand</h4>
+        <div class="brand-filter-options">
+          <label><input type="checkbox" value="versace"> Versace</label>
+          <label><input type="checkbox" value="zara"> Zara</label>
+          <label><input type="checkbox" value="gucci"> Gucci</label>
+          <label><input type="checkbox" value="prada"> Prada</label>
+          <label><input type="checkbox" value="calvinklein"> Calvin Klein</label>
+        </div>
+      </div>
+      
+      <div class="filter-buttons">
+        <button onclick="applyFilters()" class="apply-filter">Apply Filters</button>
+        <button onclick="resetFilters()" class="reset-filter">Reset</button>
+      </div>
+    </div>
+
+  
+    <section class="categories" id="shop">
+     
+      <div class="category featured" id="men">
+        <h3>Men's Collection</h3>
+        <div class="category-products">
+          <div class="product" data-id="1" data-name="Men T-shirt" data-category="men" data-brand="versace" data-price="120" data-rating="4.5">
+            <div class="product-image-container">
+              <img src="VERSACE T-SHIRT.webp" alt="T-shirt" class="product-image"/>
+              <button class="quick-view-btn" onclick="quickView('1')">Quick View</button>
+            </div>
+            <div class="product-badge">NEW</div>
+            <div class="product-info">
+              <h4>T-shirt with Tape Details</h4>
+              <div class="product-rating">
+                ★★★★☆ <span class="rating-count">(24)</span>
+              </div>
+              <div class="price-container">
+                <span class="price">$120</span>
+              </div>
+              <div class="product-actions">
+                <button class="wishlist-btn" onclick="toggleWishlistItem('1')" aria-label="Add to wishlist">
+                  <i class="far fa-heart"></i>
+                </button>
+                <button class="add-to-cart-btn" onclick="addToCart('1', 'T-shirt with Tape Details', 120, 'https://via.placeholder.com/400x480')">
+                  Add to Cart
+                </button>
+              </div>
+              <div class="product" data-id="17" data-name="Men Jacket" data-category="men" data-brand="calvinklein" data-price="199" data-rating="4.6">
+  <div class="product-image-container">
+    <img src="new jacket.jpg" alt="Bomber Jacket" class="product-image"/>
+    <button class="quick-view-btn" onclick="quickView('17')">Quick View</button>
+  </div>
+  <div class="product-info">
+    <h4>Classic Bomber Jacket</h4>
+    <div class="product-rating">
+      ★★★★☆ <span class="rating-count">(38)</span>
+    </div>
+    <div class="price-container">
+      <span class="price">$199</span>
+    </div>
+    <div class="product-actions">
+      <button class="wishlist-btn" onclick="toggleWishlistItem('17')" aria-label="Add to wishlist">
+        <i class="far fa-heart"></i>
+      </button>
+      <button class="add-to-cart-btn" onclick="addToCart('17', 'Classic Bomber Jacket', 199, 'https://via.placeholder.com/400x480')">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="product" data-id="18" data-name="Men Pants" data-category="men" data-brand="gucci" data-price="149" data-rating="4.3">
+  <div class="product-image-container">
+    <img src="skinny jeans.avif" alt="Slim Fit Pants" class="product-image"/>
+    <button class="quick-view-btn" onclick="quickView('18')">Quick View</button>
+  </div>
+  <div class="product-info">
+    <h4>Slim Fit Chino Pants</h4>
+    <div class="product-rating">
+      ★★★★☆ <span class="rating-count">(27)</span>
+    </div>
+    <div class="price-container">
+      <span class="price">$149</span>
+    </div>
+    <div class="product-actions">
+      <button class="wishlist-btn" onclick="toggleWishlistItem('18')" aria-label="Add to wishlist">
+        <i class="far fa-heart"></i>
+      </button>
+      <button class="add-to-cart-btn" onclick="addToCart('18', 'Slim Fit Chino Pants', 149, 'https://via.placeholder.com/400x480')">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+<div class="category" id="women" style="display: none;">
+  <h3>Women's Collection</h3>
+  <div class="category-products">
+    <div class="product" data-id="5" data-name="Women Dress" data-category="women" data-brand="zara" data-price="180" data-rating="4.5">
+      <div class="product-image-container">
+        <img src="floral dress.jpg" alt="Floral Summer Dress" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('5')">Quick View</button>
+      </div>
+      <div class="product-info">
+        <h4>Floral Summer Dress</h4>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(29)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$180</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('5')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('5', 'Floral Summer Dress', 180, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="contact" id="contact">
-    <div class="container">
-      <h2>Contact Me</h2>
-      <form>
-        <input type="text" placeholder="Your Name" required>
-        <input type="email" placeholder="Your Email" required>
-        <textarea rows="5" placeholder="Your Message"></textarea>
-        <button class="sendmsg" type="submit">Send Message</button>
-      </form>
+    <div class="product" data-id="6" data-name="Women Jacket" data-category="women" data-brand="prada" data-price="210" data-rating="4.3">
+      <div class="product-image-container">
+        <img src="light weight jacket.jpg" alt="Lightweight Jacket" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('6')">Quick View</button>
+      </div>
+      <div class="product-badge">HOT</div>
+      <div class="product-info">
+        <h4>Lightweight Jacket</h4>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(17)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$210</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('6')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('6', 'Lightweight Jacket', 210, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
     </div>
-  </section>
 
+   
+  </div>
+</div>
+
+<div class="category" id="kids" style="display: none;">
+  <h3>Kids' Collection</h3>
+  <div class="category-products">
+    <div class="product" data-id="9" data-name="Kids T-shirt" data-category="kids" data-brand="zara" data-price="90" data-rating="4.2">
+      <div class="product-image-container">
+        <img src="kidtshirt.jpg" alt="Cartoon Printed Tee" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('9')">Quick View</button>
+      </div>
+      <div class="product-info">
+        <h4>Cartoon Printed Tee</h4>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(19)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$90</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('9')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('9', 'Cartoon Printed Tee', 90, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product" data-id="10" data-name="Kids Shorts" data-category="kids" data-brand="calvinklein" data-price="100" data-rating="3.9">
+      <div class="product-image-container">
+        <img src="kid shorts.jpg" alt="Denim Shorts" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('10')">Quick View</button>
+      </div>
+      <div class="product-info">
+        <h4>Denim Shorts</h4>
+        <div class="product-rating">
+          ★★★☆☆ <span class="rating-count">(12)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$100</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('10')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('10', 'Denim Shorts', 100, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="category" id="accessories" style="display: none;">
+  <h3>Accessories Collection</h3>
+  <div class="category-products">
+    <div class="product" data-id="13" data-name="Designer Handbag" data-category="accessories" data-brand="prada" data-price="320" data-rating="4.8">
+      <div class="product-image-container">
+        <img src="designerbag.webp" alt="Designer Handbag" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('13')">Quick View</button>
+      </div>
+      <div class="product-badge">PREMIUM</div>
+      <div class="product-info">
+        <h4>Designer Handbag</h4>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(47)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$320</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('13')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('13', 'Designer Handbag', 320, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product" data-id="14" data-name="Stylish Sunglasses" data-category="accessories" data-brand="gucci" data-price="150" data-rating="4.5">
+      <div class="product-image-container">
+        <img src="sunglasses.webp" alt="Stylish Sunglasses" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('14')">Quick View</button>
+      </div>
+      <div class="product-info">
+        <h4>Stylish Sunglasses</h4>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(22)</span>
+        </div>
+        <div class="price-container">
+          <span class="price">$150</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('14')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('14', 'Stylish Sunglasses', 150, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="category" id="sale" style="display: none;">
+  <h3>Sale Items</h3>
+  <div class="category-products">
+    <div class="product" data-id="19" data-name="Winter Parka" data-category="sale" data-brand="northface" data-price="299" data-rating="4.7">
+      <div class="product-image-container">
+        <img src="winter parks.webp" alt="Winter Parka" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('19')">Quick View</button>
+      </div>
+      <div class="product-badge">SALE</div>
+      <div class="product-info">
+        <h4>Insulated Winter Parka</h4>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(45)</span>
+        </div>
+        <div class="price-container">
+          <span class="old-price">$399</span>
+          <span class="price">$299</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('19')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('19', 'Insulated Winter Parka', 299, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product" data-id="20" data-name="Denim Jeans" data-category="sale" data-brand="levis" data-price="79" data-rating="4.2">
+      <div class="product-image-container">
+        <img src="distressed slim.webp" alt="Distressed Jeans" class="product-image"/>
+        <button class="quick-view-btn" onclick="quickView('20')">Quick View</button>
+      </div>
+      <div class="product-badge">SALE</div>
+      <div class="product-info">
+        <h4>Distressed Slim Jeans</h4>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(33)</span>
+        </div>
+        <div class="price-container">
+          <span class="old-price">$120</span>
+          <span class="price">$79</span>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" onclick="toggleWishlistItem('20')" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart-btn" onclick="addToCart('20', 'Distressed Slim Jeans', 79, 'https://via.placeholder.com/400x480')">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    </section>
+  </div>
+  
   <footer>
-    <div class="social-links">
-      <a class="wapp" href="https://wa.me/+917488626895" target="_blank"><i class="fab fa-whatsapp"></i> </a>
-      <a class="fb" href="https://facebook.com/Md Danish Raza" target="_blank"><i class="fab fa-facebook-f"></i> </a>
-      <a class="insta" href="https://instagram.com/danishh_744" target="_blank"><i class="fab fa-instagram"></i> </a>
-      <a class="yt" href="https://youtube.com/@gtmingoo744" target="_blank"><i class="fab fa-youtube"></i> </a>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Us</h3>
+        <p>SHOP.CO is your one-stop destination for the latest fashion trends and styles. We offer a wide range of products from top international brands.</p>
+      </div>
+      <div  class="footer-section">
+        <h3>Customer Service</h3>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Shipping & Returns</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <ul class="social-media">
+          <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+          <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+          <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+          <li><a href="#"><i class="fab fa-pinterest"></i></a></li>
+        </ul>
+      </div>
     </div>
-    <p>&copy; 2025 Danish Raja. All rights reserved.</p>
+    <div class="footer-bottom">
+      &copy; 2023 SHOP.CO. All rights reserved.
+    </div>
   </footer>
 
+  <script src="script.js"></script>
 </body>
 </html>
